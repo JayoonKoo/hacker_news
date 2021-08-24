@@ -25,14 +25,18 @@ window.addEventListener('hashchange', () => {
 
 let li = "";
 for (let i=0; i<10; i++) {
-	const li = document.createElement("li"),
-		a = document.createElement("a");
-	
-	a.href = `#${newsFeed[i].id}`;
-	a.innerHTML = `${newsFeed[i].title} (${newsFeed[i].comments_count})`;
+	const div = document.createElement('dev');
 
-	li.appendChild(a);
-	ul.appendChild(li);
+	div.innerHTML =`
+		<li>
+			<a href="#${newsFeed[i].id}">
+				${newsFeed[i].title} (${newsFeed[i].comments_count})
+			</a>
+		</li>
+	`
+	
+	// ul.appendChild(div.children[0]);
+	ul.appendChild(div.firstElementChild);
 }
 
 container.appendChild(ul);
