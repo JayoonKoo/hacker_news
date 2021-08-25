@@ -5,6 +5,7 @@ const container = document.getElementById("root");
 
 const store = {
 	currentPage: 1,
+	fedds: [],
 }
 
 function getData(url) {
@@ -14,11 +15,18 @@ function getData(url) {
 	return JSON.parse(ajax.response);
 }
 
+function makeFeeds(feeds) {
+	for (let i=0; i<feeds.length; i++) {
+		feeds[i].read = false;
+	}
+
+	return feeds;
+}
+
 function newsFeed() {
-	const newsFeed = getData(NEWS_URL);
-	const maxLength = Object.keys(newsFeed).length;
-	const maxIndex = Math.ceil(maxLength/10);
+	let newsFeed = store.fedds;
 	const newsList = [];
+
 
 	let template = `
 	<div class="bg-gray-600 min-h-screen">
@@ -44,6 +52,12 @@ function newsFeed() {
 		</div>
 	</div>
 	`;
+	
+	if (newsFeed.length === 0) {
+		newsFeed = store.fedds = makeFeeds(getData(NEWS_URL));
+	}
+	const maxLength = Object.keys(newsFeed).length;
+	const maxIndex = Math.ceil(maxLength/10);
 
 	const under = store.currentPage * 10 > maxLength ? maxLength : store.currentPage * 10;
 	for (let i = (store.currentPage -1) * 10; i<under; i++) {
@@ -67,7 +81,6 @@ function newsFeed() {
 		</div>
 		`);
 	}
-
 	template = template.replace('{{__news_feed__}}', newsList.join(''));
 	template = template.replace('{{__prev_page__}}', store.currentPage > 1 ? store.currentPage -1 : 1);
 	template = template.replace('{{__next_page__}}', store.currentPage < maxIndex ? store.currentPage +1 : maxIndex);
@@ -107,6 +120,13 @@ function newsDetail() {
 	</div>
 	`;
 
+	for (let i=0; i<store.fedds.length; i++) {
+		if (store.fedds[i].id === Number(id)) {
+			store.fedds[i].read = true;
+			break;
+		}
+	}
+
 	function makeComent(comments, called=0) {
 		const commetnString = [];
 
@@ -134,7 +154,6 @@ function newsDetail() {
 
 function router() {
 	const routePath = location.hash;
-	
 	if (routePath == '') {
 		newsFeed();
 	} else if(routePath.indexOf('#/page/') >= 0){
